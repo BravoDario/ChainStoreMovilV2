@@ -1,12 +1,22 @@
 import React from "react"
-import { Button, StyleSheet, Pressable, View, Modal, Text, Image, ScrollView, TextInput } from "react-native";
+import { Alert, Button, StyleSheet, Pressable, View, Modal, Text, Image, ScrollView, TextInput } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import NavBar from "./NavBar";
-import { useState } from "react";
+import { useState, useEffect } from 'react';
+import * as Location from 'expo-location';
+import ListCarritoCompras from "../data/ShoppingCar";
 
 const ProductDetails = ({ route }) => {
     const navigation = useNavigation();
-    const [modalVisible, setModalVisible] = useState(false);
+
+    const [modalCompras, setModalCompras] = useState(false);
+    const [modalFavoritos, setModalFavoritos] = useState(false);
+    const [modalCarrito, setModalCarrito] = useState(false);
+
+    const [location, setLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [text, setText] = useState();
+    const [cant, setCant] = useState();
 
     let videojuego;
     route.params ? videojuego = route.params.videogame : videojuego = null;
@@ -14,55 +24,195 @@ const ProductDetails = ({ route }) => {
     let cliente;
     route.params ? cliente = route.params.client : cliente = null;
 
+    let coords = {
+        lat: 0,
+        long: 0
+    }
+
+    let store = {
+        lat: 21.1259214,
+        long: -101.6832418
+    }
+
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                return;
+            }
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation(location);
+        })();
+    }, []);
+
+    const calculateDistance = () => {
+        if (errorMsg) {
+            text = errorMsg;
+        } else if (location) {
+            coords = {
+                lat: location.coords.latitude,
+                long: location.coords.longitude
+            }
+
+            setText(location.coords.latitude + ", " + location.coords.longitude);
+        }
+    }
+
     const validarCompra = () => {
         if (cliente === null) {
             navigation.navigate("login")
         } else {
-            setModalVisible(true)
-            //navigation.navigate("payMethod", { verification: route.params.verification })
+            setModalCompras(true)
+            setText("Distancia de envío: \nCosto del juego: $ \nCosto del envío: $\nCosto Total: $ ");
         }
     }
     const validarwish = () => {
         if (cliente === null) {
             navigation.navigate("login")
         } else {
-            navigation.navigate("wish", { verification: route.params.verification, product: videojuego })
+            setModalFavoritos(true);
+            setText("Distancia de envío: \nCosto del juego: $ \nCosto del envío: $\nCosto Total: $ ");
         }
     }
     const validarCarrito = () => {
         if (cliente === null) {
             navigation.navigate("login")
         } else {
-            navigation.navigate("adLittleCar", { verification: route.params.verification })
+            setModalCarrito(true);
+            setText("Distancia de envío: \nCosto del juego: $ \nCosto del envío: $\nCosto Total: $ ");
         }
     }
 
+    const addCarritoCompras = () => {
+        calcularPrecio();
+        let carritoCompra = {
+            idCarrito: 0,
+            fecha: new Date().toLocaleDateString('en-US'),
+            idCliente: cliente.idCliente,
+            producto: videojuego.idVideoJuego
+        }
+        //Alerta
+        ListCarritoCompras.push(carritoCompra)
+        //se usa el rest para añadir a favoritos
+    }
+
+    const calcularPrecio = () => {
+        calculateDistance();
+        let theta = store.long - coords.long;
+        let distance = 60 * 1.1515 * (180 / Math.PI) * Math.acos(Math.sin(store.lat * (Math.PI / 180)) * Math.sin(coords.lat * (Math.PI / 180)) + Math.cos(store.lat * (Math.PI / 180)) * Math.cos(coords.lat * (Math.PI / 180)) * Math.cos(theta * (Math.PI / 180)));
+        let distancia = Math.round(distance * 1.609344, 3)
+        let costoKM = 19.36;
+        let costoEnvio = distancia * costoKM;
+        let costoTot = costoEnvio + (videojuego.producto.precio * cant);
+
+        setText("Distancia de envío: " + distancia +
+            " Km\nCosto del juego: $ " + videojuego.producto.precio * cant +
+            "\nCosto del envío: $" + costoEnvio +
+            "\nCosto Total: $ " + costoTot);
+    }
+
+    const comprarAhora = () => {
+        calcularPrecio()
+        let compra = {
+            idCompra: 0,
+            cantidad: cant,
+            precioUnitario: videojuego.producto.precio,
+            latitud: store.lat,
+            longitud: coords.long,
+            idCarrito: 0,
+            fecha: new Date().toLocaleDateString('en-US')
+        }
+        //se usa el rest de compra
+    }
+
     return (
-        <View style={{
-            backgroundColor: "#5C5C55", //Gris oscuro
-        }}>
+        <View style={{ backgroundColor: "#5C5C55" }}>
             <NavBar Client={cliente} />
-            {//desarrollado trailer
-            }
+            {/*desarrollado trailer*/}
             <Modal
+                id="Compra"
                 animationType="slide"
                 transparent={true}
-                visible={modalVisible}
+                visible={modalCompras}
                 onRequestClose={() => {
                     Alert.alert('Modal has been closed.');
-                    setModalVisible(!modalVisible);
+                    setModalCompras(!modalCompras);
+                }}>
+                <View style={{
+                    backgroundColor: "#B9B9B9DD",
+                    marginTop: 60,
+                    height: "100%",
+                    padding: 30
+                }}>
+                    <Text style={{}}>Usted comprará: {videojuego.producto.titulo}</Text>
+                    <View style={{flexDirection: "row"}}>
+                        <Text>¿Cuántos comprará?</Text>
+                        <TextInput
+                            placeholder="Cantidad"
+                            onChange={(value) => { setCant(value.nativeEvent.text) }}
+                            value={cant} />
+                    </View>
+                    <Text>{text}</Text>
+                    <Button style={[styles.button, styles.buttonClose]} title="Comprar" onPress={comprarAhora} />
+                    <Pressable
+                        style={[styles.button, styles.buttonClose]}
+                        onPress={() => setModalCompras(!modalCompras)}>
+                        <Text style={styles.textStyle}>Hide Modal</Text>
+                    </Pressable>
+                </View>
+            </Modal>
+            <Modal
+                id="Favoritos"
+                animationType="slide"
+                transparent={true}
+                visible={modalFavoritos}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                    setModalFavoritos(!modalFavoritos);
+                }}>
+
+                <View style={{
+                    backgroundColor: "#D9D9D9DD",
+                    marginTop: 60,
+                    padding: 30,
+                    height: "100%"
+                }}>
+                    <Text style={{}}>Se agregará: {videojuego.producto.titulo} a la lista de favoritos</Text>
+                    <TextInput placeholder="Cantidad" />
+                    <Pressable
+                        style={[styles.button, styles.buttonClose]}
+                        onPress={() => setModalFavoritos(!modalFavoritos)}>
+                        <Text style={styles.textStyle}>Hide Modal</Text>
+                    </Pressable>
+                    <Button title="Comprar" onPress={calculateDistance} />
+                    <Text>{text}</Text>
+                </View>
+            </Modal>
+            <Modal
+                id="Carrito"
+                animationType="slide"
+                transparent={true}
+                visible={modalCarrito}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                    setModalCarrito(!modalCarrito);
                 }}>
 
                 <View style={{
                     backgroundColor: "#B9B9B9DD",
                     marginTop: 60,
-                    height:"100%"
+                    height: "100%",
+                    padding: 30
                 }}>
-                    <Text style={{}}>Usted comprará: {videojuego.producto.titulo}</Text>
+                    <Text style={{}}>Se agregará: {videojuego.producto.titulo} al carrito de compras</Text>
                     <TextInput placeholder="Cantidad" />
+                    <Text>{text}</Text>
+                    <Button title="Agregar" onPress={addCarritoCompras} />
+                    <Button title="Ir al carrito de compras" onPress={() => navigation.navigate("littleCar", {client:cliente})} />
                     <Pressable
                         style={[styles.button, styles.buttonClose]}
-                        onPress={() => setModalVisible(!modalVisible)}>
+                        onPress={() => setModalCarrito(!modalCarrito)}>
                         <Text style={styles.textStyle}>Hide Modal</Text>
                     </Pressable>
                 </View>

@@ -12,7 +12,7 @@ export default function Login({ route }) {
 
     const login = () => {
         Clients.map(cliente => {
-            if (user === cliente.userName && pass === cliente.password) {
+            if (user === cliente.nombreUsuario && pass === cliente.contrasenia) {
                 navigation.navigate("main", { client: cliente });
             } else {
                 setComp("Usuario o contraseña incorrectos");

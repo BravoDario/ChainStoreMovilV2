@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Button, TextInput, ScrollView } from "react-native";
+import { View, Text, Button, TextInput, ScrollView, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import clients from "../data/Client";
 import NavBar from "./NavBar";
@@ -24,21 +24,30 @@ const CreateAccount = () => {
     const [colonia, setColonia] = useState();
     const [pais, setPais] = useState();
 
+    const [telefonoMovil, setTelefonoMovil] = useState();
+    const [telefonoCasa, setTelefonoCasa] = useState();
+    const [email, setEmail] = useState();
+
     const crearCliente = () => {
         let cliente = {
-            id: 0,
-            name: nombre,
-            firstLastName: primerApellido,
-            secondLastName: segundoApellido,
-            age: edad,
-            userName: nombreUsuario,
-            password: contrasena,
-            street: calle,
-            neighborhood: colonia,
-            country: pais,
+            idCliente: 0,
+            nombre,
+            primerApellido,
+            segundoApellido,
+            edad,
+            nombreUsuario,
+            contrasenia: contrasena,
+            calle,
+            colonia,
+            pais,
             token: "",
+
+            telefonoMovil,
+            telefonoCasa,
+            email
         }
         clients.push(cliente);
+        //console.log(JSON.stringify(cliente));
         navigation.navigate("profile", { Cliente: cliente })
     }
 
@@ -102,6 +111,23 @@ const CreateAccount = () => {
                     placeholder="country"
                     onChange={(value) => setPais(value.nativeEvent.text)}
                     value={pais} />
+
+                <TextInput
+                    style={styles}
+                    placeholder="Teléfono móvil"
+                    onChange={(value) => setTelefonoMovil(value.nativeEvent.text)}
+                    value={telefonoMovil} />
+                <TextInput
+                    style={styles}
+                    placeholder="Teléfono de casa"
+                    onChange={(value) => setTelefonoCasa(value.nativeEvent.text)}
+                    value={telefonoCasa} />
+                <TextInput
+                    style={styles}
+                    placeholder="Correo electrónico"
+                    onChange={(value) => setEmail(value.nativeEvent.text)}
+                    value={email} />
+
                 <Button title="Crear Cuenta" onPress={crearCliente} />
                 <Button title="volver" onPress={() => navigation.navigate('login')} />
             </ScrollView>

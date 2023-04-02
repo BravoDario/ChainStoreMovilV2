@@ -9,6 +9,7 @@ import PaymentMethod from "./PaymentMethod";
 import AddLittleCar from "./AddLittleCar";
 import History from "./History";
 import CreateAccount from "./CreateAccount";
+import LittleCar from "./LittleCar";
 
 
 const Navigator = () => {
@@ -51,6 +52,10 @@ const Navigator = () => {
             <Stack.Screen
                 name="createAccount"
                 component={CreateAccount}
+            />
+            <Stack.Screen
+                name="littleCar"
+                component={LittleCar}
             />
         </Stack.Navigator>
     )

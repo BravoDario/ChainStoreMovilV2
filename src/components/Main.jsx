@@ -7,10 +7,11 @@ import Product from "./Product";
 import videojuegos from "../data/VideoJuegos";
 import consolas from "../data/Consoles";
 import controles from "../data/Controls";
+import clients from "../data/Client";
 
 export default function Main({ route }) {
     const navigation = useNavigation();
-
+    //S
     let cliente;
     route.params ? cliente = route.params.client : cliente = null;
 
@@ -31,7 +32,7 @@ export default function Main({ route }) {
                         flexDirection: 'row'
                     }}>
                         {videojuegos.map((videojuego, index) => {
-                            return <Product key={index} videoGame={videojuego} client={cliente}/>;
+                            return <Product key={index} videoGame={videojuego} client={cliente} />;
                         })}
                     </ScrollView>
 
@@ -41,7 +42,7 @@ export default function Main({ route }) {
                     padding: 15,
                     backgroundColor: "#D9D9D9"
                 }}>
-                    <Text style={{ fontWeight: "bold", fontSize: 24 }}>Consoles</Text>
+                    <Text style={{ fontWeight: "bold", fontSize: 24 }}>Consolas</Text>
                     <ScrollView horizontal={true} style={{
                         flexDirection: 'row'
                     }}>
@@ -62,6 +63,19 @@ export default function Main({ route }) {
                         {controles.map((control, index) => {
                             return <Product key={index} videoGame={control} />;
                         })}
+                    </ScrollView>
+                </View>
+                <View style={{
+                    margin: 15,
+                    padding: 15,
+                    backgroundColor: "#D9D9D9"
+                }}>
+                    <Text style={{ fontWeight: "bold", fontSize: 24 }}>Accesorios</Text>
+                    <ScrollView horizontal={true} style={{
+                        flexDirection: 'row'
+                    }}>
+                        {/* mapeo de accesorios
+                            return <Product key={index} videoGame={control} />;*/}
                     </ScrollView>
                 </View>
             </ScrollView>

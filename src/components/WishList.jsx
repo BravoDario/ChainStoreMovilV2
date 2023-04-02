@@ -9,7 +9,6 @@ const WishList = ({ route }) => {
     let verification;
     route.params ? verification = route.params.verification : verification = null;
     
-    
     let producto;
     route.params ? producto = route.params.product : producto = null;
     
