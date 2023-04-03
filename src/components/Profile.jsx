@@ -6,8 +6,6 @@ import NavBar from "./NavBar";
 
 const Profile = ({ route }) => {
     const navigation = useNavigation();
-    let verification;
-    route.params ? verification = route.params.verification : verification = null;
 
     let client;
     route.params ? client = route.params.cliente : client = null;
@@ -17,7 +15,9 @@ const Profile = ({ route }) => {
             <View>
                 <NavBar Client={client} />
                 <ScrollView
-                    style={{ paddingTop: 30 }}>
+                    style={{ 
+                        margin: 15,
+                        marginBottom: 90,}}>
 
                     <Text>Perfil</Text>
                     <Image source={{ uri: 'https://cdmx.com/wp-content/uploads/2019/08/pedro-sola-65433.png' }}
@@ -58,6 +58,6 @@ const Profile = ({ route }) => {
                 </ScrollView>
             </View>
         )
-    } else return () => navigation.navigate("main", { client: client })
+    } else return navigation.navigate("main", { client: client })
 }
 export default Profile;

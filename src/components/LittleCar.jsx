@@ -6,16 +6,16 @@ import Product from "./Product";
 import ListCarritoCompras from "../data/ShoppingCar";
 import videogames from "../data/VideoJuegos";
 import consolas from "../data/Consoles";
+import controles from "../data/Controls";
+import accesorios from "../data/Accesories";
 
 const LittleCar = ({ route }) => {
-
     const navigation = useNavigation();
 
     let cliente;
     route.params ? cliente = route.params.client : cliente = null;
 
     let localData = [];
-
 
     ListCarritoCompras.map(carrito => {
         if (carrito.idCliente === cliente.idCliente) {
@@ -27,6 +27,16 @@ const LittleCar = ({ route }) => {
             consolas.map(consola => {
                 if (consola.producto.idProducto === carrito.producto) {
                     localData.push(consola)
+                }
+            })
+            controles.map(control => {
+                if (control.producto.idProducto === carrito.producto) {
+                    localData.push(control)
+                }
+            })
+            accesorios.map(accesorio => {
+                if (accesorio.producto.idProducto === carrito.producto) {
+                    localData.push(accesorio)
                 }
             })
         }
@@ -44,10 +54,10 @@ const LittleCar = ({ route }) => {
                 <Text>Bienvenido {cliente.nombre}</Text>
                 {
                     localData.map((data, index) => {
-                        return (<Product videoGame={data} client={cliente} key={index} />)
+                        return (<Product videoGame={data} cliente={cliente} key={index} />)
                     })
                 }
-                <Button title="volver" onPress={() => navigation.navigate('main')} />
+                <Button title="volver" onPress={() => navigation.navigate("main", {client:cliente})} />
             </ScrollView>
         </View>
     )

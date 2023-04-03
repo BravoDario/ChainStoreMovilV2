@@ -27,9 +27,9 @@ const NavBar = ({ Client }) => {
             marginTop: 30,
             backgroundColor: "#EB2300"
         }}>
-            <View style={{ margin: 3, flex: 0.3 }} >
-                <Button title="Chain Store" color="#EB2300" onPress={() => navigation.navigate("main", { client: Client })} />
-            </View>
+            <Pressable style={{ margin: 3, flex: 0.3, backgroundColor:"blue" }}  onPress={() => navigation.navigate("main", { client: Client })} >
+                <Text>Chain Store</Text>
+            </Pressable>
             <View style={{ backgroundColor: "white", margin: 5, flex: 0.7 }} >
                 <TextInput placeholder="Buscar"
                     onChange={(value) => {

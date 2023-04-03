@@ -15,8 +15,10 @@ const ProductDetails = ({ route }) => {
 
     const [location, setLocation] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
+    
     const [text, setText] = useState();
-    const [cant, setCant] = useState();
+    const [cantCompra, setCantCompra] = useState();
+    const [cantCarrit, setCantCarrit] = useState();
 
     let videojuego;
     route.params ? videojuego = route.params.videogame : videojuego = null;
@@ -27,12 +29,12 @@ const ProductDetails = ({ route }) => {
     let coords = {
         lat: 0,
         long: 0
-    }
-
-    let store = {
+    } , store = {
         lat: 21.1259214,
         long: -101.6832418
     }
+
+    let ind = ListCarritoCompras.length;
 
     useEffect(() => {
         (async () => {
@@ -54,69 +56,83 @@ const ProductDetails = ({ route }) => {
                 lat: location.coords.latitude,
                 long: location.coords.longitude
             }
-
             setText(location.coords.latitude + ", " + location.coords.longitude);
         }
     }
 
-    const validarCompra = () => {
-        if (cliente === null) {
-            navigation.navigate("login")
-        } else {
-            setModalCompras(true)
-            setText("Distancia de envío: \nCosto del juego: $ \nCosto del envío: $\nCosto Total: $ ");
-        }
-    }
-    const validarwish = () => {
-        if (cliente === null) {
-            navigation.navigate("login")
-        } else {
-            setModalFavoritos(true);
-            setText("Distancia de envío: \nCosto del juego: $ \nCosto del envío: $\nCosto Total: $ ");
-        }
-    }
-    const validarCarrito = () => {
-        if (cliente === null) {
-            navigation.navigate("login")
-        } else {
-            setModalCarrito(true);
-            setText("Distancia de envío: \nCosto del juego: $ \nCosto del envío: $\nCosto Total: $ ");
-        }
-    }
-
-    const addCarritoCompras = () => {
-        calcularPrecio();
-        let carritoCompra = {
-            idCarrito: 0,
-            fecha: new Date().toLocaleDateString('en-US'),
-            idCliente: cliente.idCliente,
-            producto: videojuego.idVideoJuego
-        }
-        //Alerta
-        ListCarritoCompras.push(carritoCompra)
-        //se usa el rest para añadir a favoritos
-    }
-
     const calcularPrecio = () => {
+        console.log(cantCompra)
         calculateDistance();
         let theta = store.long - coords.long;
         let distance = 60 * 1.1515 * (180 / Math.PI) * Math.acos(Math.sin(store.lat * (Math.PI / 180)) * Math.sin(coords.lat * (Math.PI / 180)) + Math.cos(store.lat * (Math.PI / 180)) * Math.cos(coords.lat * (Math.PI / 180)) * Math.cos(theta * (Math.PI / 180)));
         let distancia = Math.round(distance * 1.609344, 3)
         let costoKM = 19.36;
         let costoEnvio = distancia * costoKM;
-        let costoTot = costoEnvio + (videojuego.producto.precio * cant);
+        let costoTot;
+        let costoTemp;
+        
+        if(modalCarrito === true){
+            costoTemp = videojuego.producto.precio * parseInt(cantCarrit);
+        } else if (modalCompras === true){
+            costoTemp = videojuego.producto.precio * parseInt(cantCompra);
+        }
+        
+        costoTot = costoEnvio + costoTemp
 
         setText("Distancia de envío: " + distancia +
-            " Km\nCosto del juego: $ " + videojuego.producto.precio * cant +
+            " Km\nCosto del juego: $ " + costoTemp +
             "\nCosto del envío: $" + costoEnvio +
             "\nCosto Total: $ " + costoTot);
+    }
+
+    const validarCompra = () => {
+        if (cliente === null) {
+            navigation.navigate("login")
+        } else {
+            setModalCompras(true);
+            setCantCompra("1")
+            calcularPrecio()
+        }
+    }
+
+    const validarwish = () => {
+        if (cliente === null) {
+            navigation.navigate("login")
+        } else {
+            setModalFavoritos(true);
+        }
+    }
+
+    const validarCarrito = () => {
+        if (cliente === null) {
+            navigation.navigate("login")
+        } else {
+            setCantCarrit(1)
+            setModalCarrito(true);
+            calcularPrecio()
+        }
+    }
+
+    const addCarritoCompras = () => {
+        ind++;
+        calcularPrecio();
+        let carritoCompra = {
+            idCarrito: ind,
+            fecha: new Date().toLocaleDateString('en-US'),
+            idCliente: cliente.idCliente,
+            producto: videojuego.producto.idProducto
+        }
+        //Alerta
+        ListCarritoCompras.push(carritoCompra)
+        console.log(ListCarritoCompras);
+        //se usa el rest para añadir a favoritos
     }
 
     const comprarAhora = () => {
         calcularPrecio()
         let compra = {
             idCompra: 0,
-            cantidad: cant,
+            cantidad: cantCompra,
             precioUnitario: videojuego.producto.precio,
             latitud: store.lat,
             longitud: coords.long,
@@ -146,12 +162,15 @@ const ProductDetails = ({ route }) => {
                     padding: 30
                 }}>
                     <Text style={{}}>Usted comprará: {videojuego.producto.titulo}</Text>
-                    <View style={{flexDirection: "row"}}>
+                    <View style={{ flexDirection: "row" }}>
                         <Text>¿Cuántos comprará?</Text>
                         <TextInput
                             placeholder="Cantidad"
-                            onChange={(value) => { setCant(value.nativeEvent.text) }}
-                            value={cant} />
+                            onChange={(value) => { 
+                                setCantCompra(value.nativeEvent.text); 
+                                calcularPrecio() 
+                            }}
+                            value={cantCompra} />
                     </View>
                     <Text>{text}</Text>
                     <Button style={[styles.button, styles.buttonClose]} title="Comprar" onPress={comprarAhora} />
@@ -179,7 +198,6 @@ const ProductDetails = ({ route }) => {
                     height: "100%"
                 }}>
                     <Text style={{}}>Se agregará: {videojuego.producto.titulo} a la lista de favoritos</Text>
-                    <TextInput placeholder="Cantidad" />
                     <Pressable
                         style={[styles.button, styles.buttonClose]}
                         onPress={() => setModalFavoritos(!modalFavoritos)}>
@@ -206,10 +224,14 @@ const ProductDetails = ({ route }) => {
                     padding: 30
                 }}>
                     <Text style={{}}>Se agregará: {videojuego.producto.titulo} al carrito de compras</Text>
-                    <TextInput placeholder="Cantidad" />
+                    <TextInput
+                            placeholder="Cantidad"
+                            defaultValue="0"
+                            onChange={(value) => { setCantCarrit(value.nativeEvent.text); }}
+                            value={cantCarrit}  />
                     <Text>{text}</Text>
                     <Button title="Agregar" onPress={addCarritoCompras} />
-                    <Button title="Ir al carrito de compras" onPress={() => navigation.navigate("littleCar", {client:cliente})} />
+                    <Button title="Ir al carrito de compras" onPress={() => navigation.navigate("littleCar", { client: cliente })} />
                     <Pressable
                         style={[styles.button, styles.buttonClose]}
                         onPress={() => setModalCarrito(!modalCarrito)}>
@@ -260,7 +282,7 @@ const ProductDetails = ({ route }) => {
                             <Button title="Comprar ahora" onPress={validarCompra}></Button>
                         </View>
                     </View>
-                    <Button title="volver" onPress={() => navigation.navigate("main")} />
+                    <Button title="volver" onPress={() => navigation.navigate("main", {client:cliente})} />
                 </View>
             </ScrollView>
         </View>

@@ -8,6 +8,7 @@ import videojuegos from "../data/VideoJuegos";
 import consolas from "../data/Consoles";
 import controles from "../data/Controls";
 import clients from "../data/Client";
+import accesorios from "../data/Accesories";
 
 export default function Main({ route }) {
     const navigation = useNavigation();
@@ -32,7 +33,7 @@ export default function Main({ route }) {
                         flexDirection: 'row'
                     }}>
                         {videojuegos.map((videojuego, index) => {
-                            return <Product key={index} videoGame={videojuego} client={cliente} />;
+                            return <Product key={index} videoGame={videojuego} cliente={cliente} />;
                         })}
                     </ScrollView>
 
@@ -47,7 +48,7 @@ export default function Main({ route }) {
                         flexDirection: 'row'
                     }}>
                         {consolas.map((consola, index) => {
-                            return <Product key={index} videoGame={consola} />;
+                            return <Product key={index} videoGame={consola} cliente={cliente} />;
                         })}
                     </ScrollView>
                 </View>
@@ -61,7 +62,7 @@ export default function Main({ route }) {
                         flexDirection: 'row'
                     }}>
                         {controles.map((control, index) => {
-                            return <Product key={index} videoGame={control} />;
+                            return <Product key={index} videoGame={control} cliente={cliente}/>;
                         })}
                     </ScrollView>
                 </View>
@@ -73,12 +74,24 @@ export default function Main({ route }) {
                     <Text style={{ fontWeight: "bold", fontSize: 24 }}>Accesorios</Text>
                     <ScrollView horizontal={true} style={{
                         flexDirection: 'row'
-                    }}>
-                        {/* mapeo de accesorios
-                            return <Product key={index} videoGame={control} />;*/}
+                    }}> 
+                        {accesorios.map((accesorio, index) => {
+                           // return <Product key={index} videoGame={accesorio} cliente={cliente}/>;
+                        })}
                     </ScrollView>
                 </View>
             </ScrollView>
+            <View style={{
+                flexDirection:"row",
+                backgroundColor:"red",
+                marginBottom:0,
+                padding:20
+            }}>
+                <Text onPress={() => console.log("works")}>Home</Text>
+                <Text>Favoritos</Text>
+                <Text onPress={() => navigation.navigate("littleCar", {client:cliente})}>Carrito</Text>
+                <Text>Perfil</Text>
+            </View>
         </View>
     )
 }

@@ -22,19 +22,19 @@ let ListCarritoCompras = [
         idCarrito: 4,
         fecha: "hoy",
         idCliente: 2,
-        producto: 1
+        producto: 2
     },
     {
         idCarrito: 5,
         fecha: "hoy",
         idCliente: 2,
-        producto: 2
+        producto: 3
     },
     {
         idCarrito: 6,
         fecha: "hoy",
         idCliente: 2,
-        producto: 3
+        producto: 4
     }
 ]
 
