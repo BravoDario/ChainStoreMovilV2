@@ -8,7 +8,7 @@ let controles = [
         bluetooth: true,
         producto: {
             idProducto: 6,
-            titulo: "Control joystick inalámbrico Microsoft Xbox Wireless Controller Series X|S electric volt\n",
+            titulo: "Microsoft Xbox Wireless Controller Series X|S electric volt",
             precio: 1699.0,
             condicion: "nuevo",
             plataforma: "Xbox",
@@ -75,7 +75,7 @@ let controles = [
         bluetooth: true,
         producto: {
             idProducto: 8,
-            titulo: "CONTROL PLAYSTATION 5 DUALSENSE STARLIGHT BLUE",
+            titulo: "CONTROL PLAYSTATION 5 STARLIGHT BLUE",
             precio: 1649.0,
             condicion: "nuevo",
             plataforma: "Playstation 5",

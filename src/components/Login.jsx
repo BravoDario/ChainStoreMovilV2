@@ -1,74 +1,71 @@
 import React from "react";
-import { Alert, Button, Text, TextInput, View } from "react-native";
+import { Alert, ScrollView, Text, TextInput, View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import Clients from "../data/Client";
+import styles from "../data/Styles";
+import axios from "axios";
 
 export default function Login({ route }) {
     const navigation = useNavigation();
     const [user, setUser] = useState();
     const [pass, setPass] = useState();
     const [comp, setComp] = useState();
+    const [stylesE, setStylesE] = useState();
+    const [stylesI, setStylesI] = useState(styles.login.inputNormal);
+
+    const styleError = StyleSheet.create({ fontWeight: "bold", fontSize: 24, textAlign: "center", color: "red" })
 
     const login = () => {
-        Clients.map(cliente => {
-            if (user === cliente.nombreUsuario && pass === cliente.contrasenia) {
-                navigation.navigate("main", { client: cliente });
-            } else {
-                setComp("Usuario o contraseña incorrectos");
-            }
-        })
+        const url = "http://192.168.0.9:8080/login/user";
+        const datos = {
+            userName: user,
+            password: pass
+        }
+        axios.post(url, datos)
+            .then(function (response) {
+                let cliente = response.data
+                if (cliente.nombreUsuario === null) {
+                    setPass("");
+                    setUser("");
+                    setStylesI(styles.login.error.inputError);
+                    setStylesE(styles.login.error.text);
+                    setComp("Usuario o contraseña incorrectos");
+                }
+                else {
+                    Alert.alert("Bienvenido " + cliente.nombre)
+                    navigation.navigate("main", { client: cliente });
+                }
+            })
+            .catch(function (error) {console.log(error);});
     }
-
     return (
-        <View style={{
-            backgroundColor: "#5C5C55", //Gris oscuro
-            paddingTop: 60,
-            height: "100%",
-            width: "100%"
-        }}>
-            <Button title="Volver" onPress={() => navigation.navigate("main", { client:null })} />
-            <View style={{
-                backgroundColor: "#D9D9D9",
-                margin: 30,
-                borderWidth: 30,
-                borderColor: "#D9D9D9"
-            }}>
-                <Text style={{ fontWeight: "bold", fontSize: 27, textAlign: "center" }}>
-                    Login
-                </Text>
-                <Text style={{ fontWeight: "bold", fontSize: 24, marginTop: 10 }}>
-                    Username:
-                </Text>
+        <View style={styles.bdyHome2}>
+            <ScrollView style={styles.login}>
+                <Text style={styles.buttons.close} onPress={() => navigation.navigate("main", { client: null })}>Volver</Text>
+
+                <Text style={[styles.login.text, { textAlign: "center" }]}>Iniciar sesión</Text>
+                <Text style={stylesE}>{comp}</Text>
+                <Text style={styles.login.text}>Nombre de usuario:</Text>
+
                 <TextInput
-                    style={{
-                        height: 40,
-                        margin: 12,
-                        padding: 10,
-                        fontSize: 20
-                    }}
+                    style={stylesI}
                     placeholder="Username"
                     onChange={(value) => setUser(value.nativeEvent.text)}
                     value={user}
                 />
-                <Text style={{ fontWeight: "bold", fontSize: 24 }}>Password:</Text>
+                <Text style={styles.login.text}>Contraseña:</Text>
                 <TextInput
-                    style={{
-                        height: 40,
-                        margin: 12,
-                        padding: 10,
-                        fontSize: 20
-                    }}
-                    placeholder="password"
+                    style={stylesI}
+                    placeholder="Password"
                     secureTextEntry={true}
                     onChange={(value) => setPass(value.nativeEvent.text)}
                     value={pass}
                 />
-                <Button title="Login" onPress={login} > Texto</Button>
-                <Text style={{ fontWeight: "bold", fontSize: 24, textAlign: "center", color: "red" }}>{comp}</Text>
-                <Text style={{ fontWeight: "bold", fontSize: 24 }}>¿No tienes cuenta? Cree una...</Text>
-                <Button title="Crear Cuenta" onPress={() => navigation.navigate("createAccount")} />
-            </View>
+                <Text onPress={login} style={styles.buttons}>Entrar</Text>
+
+                <Text style={{ fontWeight: "bold", fontSize: 17, marginTop: 15 }}>¿No tienes cuenta? Cree una...</Text>
+                <Text onPress={() => navigation.navigate("createAccount")} style={styles.buttons.close}>Crear cuenta</Text>
+            </ScrollView>
         </View>
     )
 }

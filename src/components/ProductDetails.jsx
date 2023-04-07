@@ -1,10 +1,13 @@
 import React from "react"
-import { Alert, Button, StyleSheet, Pressable, View, Modal, Text, Image, ScrollView, TextInput } from "react-native";
+import { StyleSheet, Alert, Button, Pressable, View, Modal, Text, Image, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import NavBar from "./NavBar";
 import { useState, useEffect } from 'react';
 import * as Location from 'expo-location';
-import ListCarritoCompras from "../data/ShoppingCar";
+import axios from "axios";
+
+import NavBar from "./NavBar";
+import SubNavBar from "./SubNavBar";
+import styles from "../data/Styles";
 
 const ProductDetails = ({ route }) => {
     const navigation = useNavigation();
@@ -15,10 +18,12 @@ const ProductDetails = ({ route }) => {
 
     const [location, setLocation] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
-    
+
     const [text, setText] = useState();
-    const [cantCompra, setCantCompra] = useState();
-    const [cantCarrit, setCantCarrit] = useState();
+    const [content, setContent] = useState();
+
+    const [cantCompra, setCantCompra] = useState(0);
+    const [cantCarrit, setCantCarrit] = useState(0);
 
     let videojuego;
     route.params ? videojuego = route.params.videogame : videojuego = null;
@@ -29,14 +34,13 @@ const ProductDetails = ({ route }) => {
     let coords = {
         lat: 0,
         long: 0
-    } , store = {
+    }, store = {
         lat: 21.1259214,
         long: -101.6832418
     }
 
-    let ind = ListCarritoCompras.length;
-
     useEffect(() => {
+        getContenido();
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
@@ -56,27 +60,21 @@ const ProductDetails = ({ route }) => {
                 lat: location.coords.latitude,
                 long: location.coords.longitude
             }
-            setText(location.coords.latitude + ", " + location.coords.longitude);
         }
     }
 
-    const calcularPrecio = () => {
-        console.log(cantCompra)
+    const calcularPrecio = (cantidadProducto) => {
         calculateDistance();
         let theta = store.long - coords.long;
         let distance = 60 * 1.1515 * (180 / Math.PI) * Math.acos(Math.sin(store.lat * (Math.PI / 180)) * Math.sin(coords.lat * (Math.PI / 180)) + Math.cos(store.lat * (Math.PI / 180)) * Math.cos(coords.lat * (Math.PI / 180)) * Math.cos(theta * (Math.PI / 180)));
-        let distancia = Math.round(distance * 1.609344, 3)
+        let distancia = Math.round(distance * 1.609344, 4)
         let costoKM = 19.36;
         let costoEnvio = distancia * costoKM;
         let costoTot;
         let costoTemp;
-        
-        if(modalCarrito === true){
-            costoTemp = videojuego.producto.precio * parseInt(cantCarrit);
-        } else if (modalCompras === true){
-            costoTemp = videojuego.producto.precio * parseInt(cantCompra);
-        }
-        
+
+        costoTemp = videojuego.producto.precio * cantidadProducto;
+
         costoTot = costoEnvio + costoTemp
 
         setText("Distancia de envío: " + distancia +
@@ -85,18 +83,40 @@ const ProductDetails = ({ route }) => {
             "\nCosto Total: $ " + costoTot);
     }
 
+    function getCantidadCarrito(change, cantidad) {
+        if (change === "+") {
+            cantidad++;
+        } else if (change === "-") {
+            cantidad--;
+        }
+        setCantCarrit(cantidad)
+        calcularPrecio(cantidad)
+        console.log(cantCarrit);
+    }
+
+    const getCantidadCompra = (change, cantidad) => {
+        if (change === "+") {
+            cantidad++;
+        } else if (change === "-") {
+            cantidad--;
+        }
+        setCantCompra(cantidad)
+        calcularPrecio(cantidad)
+    }
+
     const validarCompra = () => {
         if (cliente === null) {
+            Alert.alert("Es necesario iniciar sesión.");
             navigation.navigate("login")
         } else {
             setModalCompras(true);
-            setCantCompra("1")
             calcularPrecio()
         }
     }
 
     const validarwish = () => {
         if (cliente === null) {
+            Alert.alert("Es necesario iniciar sesión.");
             navigation.navigate("login")
         } else {
             setModalFavoritos(true);
@@ -105,45 +125,86 @@ const ProductDetails = ({ route }) => {
 
     const validarCarrito = () => {
         if (cliente === null) {
+            Alert.alert("Es necesario iniciar sesión.");
             navigation.navigate("login")
         } else {
-            setCantCarrit(1)
             setModalCarrito(true);
-            calcularPrecio()
         }
     }
 
     const addCarritoCompras = () => {
-        ind++;
-        calcularPrecio();
         let carritoCompra = {
-            idCarrito: ind,
+            idCarrito: 0,
             fecha: new Date().toLocaleDateString('en-US'),
             idCliente: cliente.idCliente,
-            producto: videojuego.producto.idProducto
+            idProducto: videojuego.producto.idProducto,
+            cantidad: cantCarrit,
+            comprado: 0
         }
-        //Alerta
-        ListCarritoCompras.push(carritoCompra)
-        console.log(ListCarritoCompras);
-        //se usa el rest para añadir a favoritos
+        const url = "http://192.168.0.9:8080/shopping/addShoppingCar";
+
+        axios.post(url, carritoCompra)
+            .then(function (response) {
+                Alert.alert("Confirmación", "Su producto se agregó exitosamente c:")
+            })
+            .catch(function (error) {
+                Alert.alert("Error", "Su producto no se agregó, intente más tarde :c")
+            });
     }
 
     const comprarAhora = () => {
-        calcularPrecio()
+        calculateDistance();
         let compra = {
             idCompra: 0,
             cantidad: cantCompra,
             precioUnitario: videojuego.producto.precio,
-            latitud: store.lat,
+            latitud: coords.lat,
             longitud: coords.long,
             idCarrito: 0,
-            fecha: new Date().toLocaleDateString('en-US')
+            fecha: new Date().toLocaleDateString('en-US'),
+            idCliente: cliente.idCliente,
+            idProducto: videojuego.producto.idProducto
         }
-        //se usa el rest de compra
+        console.log(JSON.stringify(compra));
+        const url = "http://192.168.0.9:8080/shopping/addCompra";
+
+        axios.post(url, compra)
+            .then(function (response) {
+                if (response.data === true) {
+                    Alert.alert("Confirmación", "Seleccione su método de pago c:");
+                    navigation.navigate("payMethod");
+                } else {
+                    Alert.alert("Error", "Su compra no pudo ser realizada, intente más tarde :c")
+                }
+            })
+            .catch(function (error) {
+                Alert.alert("Error", "Su compra no pudo ser realizada, intente más tarde :c")
+            });
     }
 
+    const getContenido = () => {
+        let texto = "";
+        if (videojuego.desarrollado !== undefined) texto += videojuego.desarrollado + "\n" + videojuego.clasificacion + "\n" + videojuego.genero
+
+        if (videojuego.almacenamiento !== undefined) {
+            texto += videojuego.almacenamiento + "\n"
+            videojuego.control ? texto += "Con control" : texto += "Sin control"
+            "\n" + videojuego.resolucion + "\n" + videojuego.ram + "\n" + videojuego.tipoDeMemoria
+        }
+
+        if (videojuego.inalambrico !== undefined) videojuego.inalambrico ? texto += "Inalámbrico" : texto += "Alámbrico"
+
+        if (videojuego.color !== undefined) {
+            texto += "\n" + videojuego.color + "\n" + videojuego.conectoresDeEntrada
+            videojuego.vibracion ? texto += "\nCon vibración" : texto += "\nSin vibración";
+            videojuego.bluetooth ? texto += "\nCon bluetooth" : texto += "\nSin bluetooth";
+        }
+
+        if (videojuego.material !== undefined) texto += "\n" + videojuego.material
+        setContent(texto);
+    }
     return (
-        <View style={{ backgroundColor: "#5C5C55" }}>
+        <View style={styles.bdyHome}>
             <NavBar Client={cliente} />
             {/*desarrollado trailer*/}
             <Modal
@@ -151,34 +212,24 @@ const ProductDetails = ({ route }) => {
                 animationType="slide"
                 transparent={true}
                 visible={modalCompras}
-                onRequestClose={() => {
-                    Alert.alert('Modal has been closed.');
-                    setModalCompras(!modalCompras);
-                }}>
-                <View style={{
-                    backgroundColor: "#B9B9B9DD",
-                    marginTop: 60,
-                    height: "100%",
-                    padding: 30
-                }}>
-                    <Text style={{}}>Usted comprará: {videojuego.producto.titulo}</Text>
-                    <View style={{ flexDirection: "row" }}>
-                        <Text>¿Cuántos comprará?</Text>
-                        <TextInput
-                            placeholder="Cantidad"
-                            onChange={(value) => { 
-                                setCantCompra(value.nativeEvent.text); 
-                                calcularPrecio() 
-                            }}
-                            value={cantCompra} />
+                onRequestClose={() => { Alert.alert('Modal has been closed.'); setModalCompras(!modalCompras); }}>
+                <View style={styles.productoDetalle.modal}>
+                    <Text style={styles.productoDetalle.modal.text}>Usted comprará: {videojuego.producto.titulo + "\n"}¿Cuántos comprará?</Text>
+                    <View style={{ flexDirection: "row", width: 200, margin: 10 }}>
+                        <Text style={styles.productoDetalle.modal.cantidad} onPress={() => getCantidadCompra("-", cantCompra)}>-</Text>
+                        <Text style={styles.productoDetalle.modal.cantidad}>{cantCompra}</Text>
+                        <Text style={styles.productoDetalle.modal.cantidad} onPress={() => getCantidadCompra("+", cantCompra)}>+</Text>
                     </View>
-                    <Text>{text}</Text>
-                    <Button style={[styles.button, styles.buttonClose]} title="Comprar" onPress={comprarAhora} />
-                    <Pressable
-                        style={[styles.button, styles.buttonClose]}
-                        onPress={() => setModalCompras(!modalCompras)}>
-                        <Text style={styles.textStyle}>Hide Modal</Text>
-                    </Pressable>
+                    <Text style={styles.productoDetalle.modal.text}>{text}</Text>
+                    <Text style={styles.buttons} onPress={() => {
+                        Alert.alert('Confirmación', 'Se agregará este producto a su carrito de compras', [{
+                            text: 'Cancel',
+                            onPress: () => console.log('Cancel Pressed'),
+                            style: 'cancel',
+                        },
+                        { text: 'OK', onPress: () => comprarAhora() },]);
+                    }}>Comprar ahora</Text>
+                    <Text style={[styles.buttons, styles.buttons.close]} onPress={() => setModalCompras(!modalCompras)}>Volver</Text>
                 </View>
             </Modal>
             <Modal
@@ -212,124 +263,79 @@ const ProductDetails = ({ route }) => {
                 animationType="slide"
                 transparent={true}
                 visible={modalCarrito}
-                onRequestClose={() => {
-                    Alert.alert('Modal has been closed.');
-                    setModalCarrito(!modalCarrito);
-                }}>
-
-                <View style={{
-                    backgroundColor: "#B9B9B9DD",
-                    marginTop: 60,
-                    height: "100%",
-                    padding: 30
-                }}>
-                    <Text style={{}}>Se agregará: {videojuego.producto.titulo} al carrito de compras</Text>
-                    <TextInput
-                            placeholder="Cantidad"
-                            defaultValue="0"
-                            onChange={(value) => { setCantCarrit(value.nativeEvent.text); }}
-                            value={cantCarrit}  />
-                    <Text>{text}</Text>
-                    <Button title="Agregar" onPress={addCarritoCompras} />
-                    <Button title="Ir al carrito de compras" onPress={() => navigation.navigate("littleCar", { client: cliente })} />
-                    <Pressable
-                        style={[styles.button, styles.buttonClose]}
-                        onPress={() => setModalCarrito(!modalCarrito)}>
-                        <Text style={styles.textStyle}>Hide Modal</Text>
-                    </Pressable>
+                onRequestClose={() => { Alert.alert('Modal has been closed.'); setModalCarrito(!modalCarrito); }}>
+                <View style={styles.productoDetalle.modal}>
+                    <Text style={styles.productoDetalle.modal.text}>Se agregarán: {videojuego.producto.titulo} al carrito de compras</Text>
+                    <View style={{ flexDirection: "row", width: 200, margin: 10 }}>
+                        <Text style={styles.productoDetalle.modal.cantidad} onPress={() => {
+                            getCantidadCarrito("-", cantCarrit);
+                        }}>-</Text>
+                        <Text style={styles.productoDetalle.modal.cantidad}>{cantCarrit}</Text>
+                        <Text style={styles.productoDetalle.modal.cantidad} onPress={() => {
+                            getCantidadCarrito("+", cantCarrit);
+                        }}>+</Text>
+                    </View>
+                    <Text style={styles.productoDetalle.modal.text}>{text}</Text>
+                    <Text style={styles.buttons} onPress={() => {
+                        Alert.alert('Confirmación', 'Se agregará este producto a su carrito de compras', [{
+                            text: 'Cancel',
+                            onPress: () => console.log('Cancel Pressed'),
+                            style: 'cancel',
+                        },
+                        { text: 'OK', onPress: () => addCarritoCompras() },]);
+                    }}>Agregar</Text>
+                    <Text style={styles.buttons} onPress={() => navigation.navigate("littleCar", { client: cliente })}>Ir al carrito de compras</Text>
+                    <Text style={[styles.buttons, styles.buttons.close]} onPress={() => setModalCarrito(!modalCarrito)}>Volver</Text>
                 </View>
             </Modal>
-            <ScrollView style={{
-                margin: 15,
-                marginBottom: 90,
-                backgroundColor: "white"
-            }}>
-                <Text style={{ fontWeight: "bold", fontSize: 27, padding: 15 }}>{videojuego.producto.titulo}</Text>
+            <ScrollView style={styles.productoDetalle.descriptionContent}>
+                <Text style={styles.productoDetalle.tittle}>{videojuego.producto.titulo}</Text>
                 <View style={{ flexDirection: 'row' }}>
-
-                    <Image source={{ uri: videojuego.listaFotos[0].foto }}
+                    <Image source={{ uri: videojuego.producto.listaFotos[0].foto }}
                         style={{ width: 160, height: 220, margin: 10 }} />
-                    <View style={{ marginTop: 10, width: 135 }} >
+                    <View style={{ width: 135 }} >
                         <Text style={{ fontSize: 20 }}>$ {videojuego.producto.precio
                             + '\n' + videojuego.producto.plataforma
                             + '\n' + videojuego.producto.lanzamiento
                             + '\n' + videojuego.clasificacion
                             + '\n' + videojuego.producto.publicador
-                            + '\n' + videojuego.genero}</Text>
+                            + '\n' + videojuego.genero}
+                        </Text>
                     </View>
                 </View>
                 <ScrollView horizontal={true} style={{ flexDirection: 'row' }}>
-                    {videojuego.listaFotos.map((foto, index) => { return <Image key={index} source={{ uri: foto.foto }} style={{ margin: 5, width: 100, height: 120 }} /> })}
+                    {videojuego.producto.listaFotos.map((foto, index) => { return <Image key={index} source={{ uri: foto.foto }} style={{ margin: 5, width: 100, height: 120 }} /> })}
                 </ScrollView>
-                <View style={{
-                    margin: 10,
-                }}>
-                    <Text style={{ fontSize: 20, textAlign: "justify" }}>{"Descripión: \n" + videojuego.producto.descripcion + "\n"
-                        + "\nCondición: " + videojuego.producto.condicion
-                        + "\nGarantía: " + videojuego.producto.garantia}</Text>
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        margin: 10
-                    }}>
-                        <View style={{ margin: 3, flex: 0.4 }} >
-                            <Button title="Agregar al carrito" onPress={validarCarrito}></Button>
-                        </View>
-                        <View style={{ margin: 3, flex: 0.4 }} >
-                            <Button title="Agregar a favoritos" onPress={validarwish}></Button>
-                        </View>
-                        <View style={{ margin: 3, flex: 0.4 }} >
-                            <Button title="Comprar ahora" onPress={validarCompra}></Button>
-                        </View>
-                    </View>
-                    <Button title="volver" onPress={() => navigation.navigate("main", {client:cliente})} />
+                <View style={{ margin: 10 }}>
+                    <Text style={{ fontSize: 20, textAlign: "justify" }}>
+                        {"Descripión: \n" + videojuego.producto.descripcion + "\n"
+                            + "\nCondición: " + videojuego.producto.condicion
+                            + "\nGarantía: " + videojuego.producto.garantia}
+                    </Text>
+                </View>
+                <View style={{ margin: 10 }}>
+                    <Text style={{ fontSize: 20, textAlign: "justify" }}>{content}</Text>
                 </View>
             </ScrollView>
+            <View style={styles.productoDetalle.allButton}>
+                <View style={styles.productoDetalle.littleButtons}>
+                    <Pressable style={styles.productoDetalle} onPress={validarCarrito}>
+                        <Text style={styles.productoDetalle.text}>Agregar al carrito</Text>
+                    </Pressable>
+                    <Pressable style={styles.productoDetalle} onPress={validarwish}>
+                        <Text style={styles.productoDetalle.text}>Agregar a favoritos</Text>
+                    </Pressable>
+                    <Pressable style={styles.productoDetalle} onPress={validarCompra}>
+                        <Text style={styles.productoDetalle.text}>Comprar ahora</Text>
+                    </Pressable>
+                </View>
+                <Pressable style={styles.productoDetalle} onPress={() => navigation.navigate("main", { client: cliente })}>
+                    <Text style={styles.productoDetalle.text}>Volver</Text>
+                </Pressable>
+            </View>
+            <SubNavBar cliente={cliente} />
         </View>
     )
 }
-const styles = StyleSheet.create({
-    centeredView: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 22,
-    },
-    modalView: {
-        margin: 20,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 35,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    button: {
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2,
-    },
-    buttonOpen: {
-        backgroundColor: '#F194FF',
-    },
-    buttonClose: {
-        backgroundColor: '#2196F3',
-    },
-    textStyle: {
-        color: 'white',
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    modalText: {
-        marginBottom: 15,
-        textAlign: 'center',
-    },
-});
 
 export default ProductDetails;

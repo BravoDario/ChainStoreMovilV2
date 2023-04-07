@@ -1,34 +1,64 @@
 import React from "react";
-import { Alert, Button, TouchableOpacity, ScrollView, Text, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useState, useEffect } from 'react';
+import { ScrollView, Text, View } from "react-native";
+import axios from "axios";
+
 import NavBar from "./NavBar";
+import SubNavBar from "./SubNavBar";
+import styles from "../data/Styles";
 import Product from "./Product";
 
-import videojuegos from "../data/VideoJuegos";
-import consolas from "../data/Consoles";
-import controles from "../data/Controls";
-import clients from "../data/Client";
-import accesorios from "../data/Accesories";
-
 export default function Main({ route }) {
-    const navigation = useNavigation();
-    //S
     let cliente;
     route.params ? cliente = route.params.client : cliente = null;
 
+    const [videojuegos, setVideojuegos] = useState([]);
+    const [consolas, setConsolas] = useState([]);
+    const [controles, setControles] = useState([]);
+    const [accesorios, setAccesorios] = useState([]);
+
+    useEffect(() => {
+        const path = "http://192.168.0.9:8080";
+
+        axios.get(path + "/accesorio/get?plataform=0&filter=0")
+            .then(function (response) {
+                setAccesorios(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+        axios.get(path + "/videoJuego/get?plataform=0&filter=0")
+            .then(function (response) {
+                setVideojuegos(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+        axios.get(path + "/consola/get?plataform=0&filter=0")
+            .then(function (response) {
+                setConsolas(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+        axios.get(path + "/control/get?plataform=0&filter=0")
+            .then(function (response) {
+                setControles(response.data);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }, []);
+
     return (
-        <View style={{
-            backgroundColor: "#5C5C55", //Gris oscuro
-            height: "100%"
-        }}>
+        <View style={styles.body}>
             <NavBar Client={cliente} />
             <ScrollView>
-                <View style={{
-                    padding: 15,
-                    margin: 15,
-                    backgroundColor: "#D9D9D9"
-                }}>
-                    <Text style={{ fontWeight: "bold", fontSize: 24 }}>Videojuegos</Text>
+                <View style={styles.body.grandContainer}>
+                    <Text style={styles.body.textTittle}>Videojuegos</Text>
                     <ScrollView horizontal={true} style={{
                         flexDirection: 'row'
                     }}>
@@ -36,62 +66,33 @@ export default function Main({ route }) {
                             return <Product key={index} videoGame={videojuego} cliente={cliente} />;
                         })}
                     </ScrollView>
-
                 </View>
-                <View style={{
-                    margin: 15,
-                    padding: 15,
-                    backgroundColor: "#D9D9D9"
-                }}>
-                    <Text style={{ fontWeight: "bold", fontSize: 24 }}>Consolas</Text>
-                    <ScrollView horizontal={true} style={{
-                        flexDirection: 'row'
-                    }}>
+                <View style={styles.body.grandContainer}>
+                    <Text style={styles.body.textTittle}>Consolas</Text>
+                    <ScrollView horizontal={true} style={{ flexDirection: 'row' }}>
                         {consolas.map((consola, index) => {
                             return <Product key={index} videoGame={consola} cliente={cliente} />;
                         })}
                     </ScrollView>
                 </View>
-                <View style={{
-                    margin: 15,
-                    padding: 15,
-                    backgroundColor: "#D9D9D9"
-                }}>
-                    <Text style={{ fontWeight: "bold", fontSize: 24 }}>Controles</Text>
-                    <ScrollView horizontal={true} style={{
-                        flexDirection: 'row'
-                    }}>
+                <View style={styles.body.grandContainer}>
+                    <Text style={styles.body.textTittle}>Controles</Text>
+                    <ScrollView horizontal={true} style={{ flexDirection: 'row' }}>
                         {controles.map((control, index) => {
-                            return <Product key={index} videoGame={control} cliente={cliente}/>;
+                            return <Product key={index} videoGame={control} cliente={cliente} />;
                         })}
                     </ScrollView>
                 </View>
-                <View style={{
-                    margin: 15,
-                    padding: 15,
-                    backgroundColor: "#D9D9D9"
-                }}>
-                    <Text style={{ fontWeight: "bold", fontSize: 24 }}>Accesorios</Text>
-                    <ScrollView horizontal={true} style={{
-                        flexDirection: 'row'
-                    }}> 
+                <View style={styles.body.grandContainer}>
+                    <Text style={styles.body.textTittle}>Accesorios</Text>
+                    <ScrollView horizontal={true} style={{ flexDirection: 'row' }}>
                         {accesorios.map((accesorio, index) => {
-                           // return <Product key={index} videoGame={accesorio} cliente={cliente}/>;
+                            return <Product key={index} videoGame={accesorio} cliente={cliente} />;
                         })}
                     </ScrollView>
                 </View>
             </ScrollView>
-            <View style={{
-                flexDirection:"row",
-                backgroundColor:"red",
-                marginBottom:0,
-                padding:20
-            }}>
-                <Text onPress={() => console.log("works")}>Home</Text>
-                <Text>Favoritos</Text>
-                <Text onPress={() => navigation.navigate("littleCar", {client:cliente})}>Carrito</Text>
-                <Text>Perfil</Text>
-            </View>
+            <SubNavBar cliente={cliente} />
         </View>
     )
 }

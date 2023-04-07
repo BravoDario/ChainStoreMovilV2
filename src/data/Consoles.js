@@ -44,7 +44,7 @@ let consolas = [
         tipoDeMemoria: "GDDR6 ",
         producto: {
             idProducto: 3,
-            titulo: "CONSOLA PLAYSTATION 5 BUNDLE GOD OF WAR RAGNAROK",
+            titulo: "PLAYSTATION 5 BUNDLE GOD OF WAR RAGNAROK",
             precio: 15299.0,
             condicion: "nuevo",
             plataforma: "PlayStation 5",
@@ -75,7 +75,7 @@ let consolas = [
         tipoDeMemoria: "GDDR6",
         producto: {
             idProducto: 5,
-            titulo: "Consola PlayStation de 1 TB edición Bundle God of War Ragnarok",
+            titulo: "Consola PlayStationedición Bundle God of War Ragnarok",
             precio: 9499.0,
             condicion: "nuevo",
             plataforma: "PS4",

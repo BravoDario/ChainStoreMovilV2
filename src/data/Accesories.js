@@ -13,7 +13,7 @@ let accesorios = [
             publicador: "REDLEMON",
             lanzamiento: "27 de enero 2023"
         },
-        listFotos: [
+        listaFotos: [
             {
                 idFoto: 24,
                 foto: "https://cdn.gameplanet.com/wp-content/uploads/2023/03/02184247/0631145843407-base-carga-redlemon-playstation-1-510x630.jpg",
@@ -45,7 +45,7 @@ let accesorios = [
             publicador: "VOLTEDGE",
             lanzamiento: "3 de marzo 2023"
         },
-        listFotos: [
+        listaFotos: [
             {
                 idFoto: 27,
                 foto: "https://cdn.gameplanet.com/wp-content/uploads/2023/03/09174438/850021579517-base-carga-voltedge-xbox-1-510x630.jpg",
@@ -77,7 +77,7 @@ let accesorios = [
             publicador: "REDLEMON",
             lanzamiento: "27 de febrero 2023"
         },
-        listFotos: [
+        listaFotos: [
             {
                 idFoto: 30,
                 foto: "https://cdn.gameplanet.com/wp-content/uploads/2023/03/03115359/0631145841373-base-carga-4-joy-con-redlemon-1-510x630.jpg",
@@ -96,5 +96,4 @@ let accesorios = [
         ]
     }
 ]
-
 export default accesorios;

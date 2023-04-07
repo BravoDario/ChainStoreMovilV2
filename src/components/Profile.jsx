@@ -17,7 +17,8 @@ const Profile = ({ route }) => {
                 <ScrollView
                     style={{ 
                         margin: 15,
-                        marginBottom: 90,}}>
+                        marginBottom: 90,
+                    }}>
 
                     <Text>Perfil</Text>
                     <Image source={{ uri: 'https://cdmx.com/wp-content/uploads/2019/08/pedro-sola-65433.png' }}
