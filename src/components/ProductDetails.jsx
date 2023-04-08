@@ -206,7 +206,6 @@ const ProductDetails = ({ route }) => {
     return (
         <View style={styles.bdyHome}>
             <NavBar Client={cliente} />
-            {/*desarrollado trailer*/}
             <Modal
                 id="Compra"
                 animationType="slide"
@@ -222,7 +221,7 @@ const ProductDetails = ({ route }) => {
                     </View>
                     <Text style={styles.productoDetalle.modal.text}>{text}</Text>
                     <Text style={styles.buttons} onPress={() => {
-                        Alert.alert('Confirmación', 'Se agregará este producto a su carrito de compras', [{
+                        Alert.alert('Confirmación', 'Usted comprará este producto ahora', [{
                             text: 'Cancel',
                             onPress: () => console.log('Cancel Pressed'),
                             style: 'cancel',
