@@ -145,10 +145,10 @@ const ProductDetails = ({ route }) => {
 
         axios.post(url, carritoCompra)
             .then(function (response) {
-                Alert.alert("Confirmación", "Su producto se agregó exitosamente c:")
+                Alert.alert("Confirmación", "Su producto se agregó exitosamente")
             })
             .catch(function (error) {
-                Alert.alert("Error", "Su producto no se agregó, intente más tarde :c")
+                Alert.alert("Error", "Su producto no se agregó, intente más tarde")
             });
     }
 

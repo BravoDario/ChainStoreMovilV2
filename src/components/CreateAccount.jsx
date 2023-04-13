@@ -27,7 +27,7 @@ const CreateAccount = () => {
     const [stylesE, setStylesE] = useState();
 
     const agregarCliente = (cliente) => {
-        const url = "http://192.168.0.11:8080/cliente/insertar";
+        const url = "http://192.168.0.9:8080/cliente/insertar";
         axios.post(url, cliente)
             .then(function (response) {
                 if (response.data === true) {

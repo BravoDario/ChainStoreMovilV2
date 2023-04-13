@@ -165,6 +165,10 @@ const styles = StyleSheet.create({
             marginBottom: 20,
             paddingTop: 5
         }
+    },
+    littleText: {
+        fontWeight: "bold", 
+        fontSize: 15
     }
 })
 

@@ -19,6 +19,9 @@ const LittleCar = ({ route }) => {
     let coords = {
         lat: 0,
         long: 0
+    }, store = {
+        lat: 21.1259214,
+        long: -101.6832418
     }
 
     let cliente;
@@ -51,19 +54,19 @@ const LittleCar = ({ route }) => {
             productos: localData
         }
         let compra = {
-            idCompra,
+            //idCompra,
             cantidad,
             precioUnitario,
             latitud,
             longitud,
-            idCarrito,
+            //idCarrito,
             fecha
         }
     }
 
     const calculateDistance = () => {
         if (errorMsg) {
-            text = errorMsg;
+            Alert.alert(errorMsg);
         } else if (location) {
             coords = {
                 lat: location.coords.latitude,
@@ -72,12 +75,27 @@ const LittleCar = ({ route }) => {
         }
     }
 
-    const comprarAhora = (carrito) => {
+    const calcularPrecio = (precio, cantidad) => {
         calculateDistance();
+        let theta = store.long - coords.long;
+        let distance = 60 * 1.1515 * (180 / Math.PI) * Math.acos(Math.sin(store.lat * (Math.PI / 180)) * Math.sin(coords.lat * (Math.PI / 180)) + Math.cos(store.lat * (Math.PI / 180)) * Math.cos(coords.lat * (Math.PI / 180)) * Math.cos(theta * (Math.PI / 180)));
+        let distancia = Math.round(distance * 1.609344, 4)
+        let costoKM = 19.36;
+        let costoEnvio = distancia * costoKM;
+        let costoTot;
+        let costoTemp;
+
+        costoTemp = precio * cantidad;
+
+        costoTot = costoEnvio + costoTemp
+        return costoTot;
+    }
+
+    const comprarAhora = (carrito) => {
         let compra = {
             idCompra: 0,
             cantidad: carrito.cantidad,
-            precioUnitario: carrito.producto.precio,
+            precioUnitario: calcularPrecio(carrito.producto.precio, carrito.cantidad),
             latitud: coords.lat,
             longitud: coords.long,
             idCarrito: carrito.idCarrito,
@@ -85,7 +103,7 @@ const LittleCar = ({ route }) => {
             idCliente: cliente.idCliente,
             idProducto: carrito.producto.idProducto
         }
-        console.log(JSON.stringify(compra));
+        
         const url = "http://192.168.0.9:8080/shopping/addCompra";
 
         axios.post(url, compra)
@@ -120,18 +138,9 @@ const LittleCar = ({ route }) => {
             });
     }
 
-
-    const refreshScreen = () => {
-        if (ref.current) {
-            ref.current.forceUpdate();
-        }
-    };
-
-
     return (
         <View style={styles.body}>
             <NavBar Client={cliente} />
-            <Button title="OK" onPress={refreshScreen} />
             <ScrollView ref={ref} style={styles.body.grandContainer}>
                 <Text style={styles.productoDetalle.tittle}>Carrito de compras {"\n"}
                     Bienvenido {cliente.nombre}</Text>
@@ -139,19 +148,21 @@ const LittleCar = ({ route }) => {
                     carrito.map((data, index) => {
                         return (
                             <View style={{ flexDirection: "row", backgroundColor: "white", borderRadius: 5, marginBottom: 10 }} key={{ index }}>
+                                
                                 <Product videoGame={data} cliente={cliente} />
+                                
                                 <View style={{ width: 140, paddingTop: 30 }}>
-                                    <Text style={styles.buttons}
-                                        onPress={() => {
-                                            Alert.alert('Confirmación', 'Usted comprará este producto ahora', [{
-                                                text: 'Cancelar',
-                                                onPress: () => console.log('Cancel Pressed'),
-                                                style: 'cancel',
-                                            },
-                                            { text: 'OK', onPress: () => comprarAhora(data) },]);
-                                        }
-                                        }
-                                    >Comprar ahora</Text>
+                                    <Text style={styles.buttons} onPress={() => {
+                                        Alert.alert('Confirmación', 'Usted comprará este producto ahora', [{
+                                            text: 'Cancelar',
+                                            onPress: () => console.log('Cancel Pressed'),
+                                            style: 'cancel',
+                                        },
+                                        { text: 'OK', onPress: () => comprarAhora(data) },]);
+                                    }}>
+                                        Comprar ahora
+                                    </Text>
+                                
                                     <Text style={styles.buttons.close} onPress={() => {
                                         Alert.alert('Confirmación', 'Se quitará este producto de su carrito de compras', [{
                                             text: 'Cancelar',
@@ -159,7 +170,15 @@ const LittleCar = ({ route }) => {
                                             style: 'cancel',
                                         },
                                         { text: 'OK', onPress: () => quitarCarrito(data.idCarrito) },]);
-                                    }}>Quitar del carrito</Text>
+                                    }}>
+                                        Quitar del carrito
+                                    </Text>
+                                    <Text style={styles.littleText}>
+                                        {
+                                            "Cantidad: " + data.cantidad + 
+                                            "\nTotal: $"+ data.producto.precio
+                                        }
+                                    </Text>
                                 </View>
                             </View>
                         )
