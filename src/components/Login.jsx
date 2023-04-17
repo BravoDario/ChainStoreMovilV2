@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import styles from "../data/Styles";
 import axios from "axios";
+import { TouchableOpacity } from "react-native";
 
 export default function Login({ route }) {
     const navigation = useNavigation();
@@ -36,13 +37,14 @@ export default function Login({ route }) {
                     navigation.navigate("main", { client: cliente });
                 }
             })
-            .catch(function (error) {console.log(error);});
+            .catch(function (error) { console.log(error); });
     }
     return (
         <View style={styles.bdyHome2}>
             <ScrollView style={styles.login}>
-                <Text style={styles.buttons.close} onPress={() => navigation.navigate("main", { client: null })}>Volver</Text>
-
+                <TouchableOpacity onPress={() => navigation.navigate("main", { client: null })}>
+                    <Text style={styles.buttons.close}>Volver</Text>
+                </TouchableOpacity>
                 <Text style={[styles.login.text, { textAlign: "center" }]}>Iniciar sesión</Text>
                 <Text style={stylesE}>{comp}</Text>
                 <Text style={styles.login.text}>Nombre de usuario:</Text>
@@ -61,10 +63,14 @@ export default function Login({ route }) {
                     onChange={(value) => setPass(value.nativeEvent.text)}
                     value={pass}
                 />
-                <Text onPress={login} style={styles.buttons}>Entrar</Text>
 
+                <TouchableOpacity onPress={login}>
+                    <Text style={styles.buttons}>Entrar</Text>
+                </TouchableOpacity>
                 <Text style={{ fontWeight: "bold", fontSize: 17, marginTop: 15 }}>¿No tienes cuenta? Cree una...</Text>
-                <Text onPress={() => navigation.navigate("createAccount")} style={styles.buttons.close}>Crear cuenta</Text>
+                <TouchableOpacity onPress={() => navigation.navigate("createAccount")}>
+                    <Text style={styles.buttons.close}>Crear cuenta</Text>
+                </TouchableOpacity>
             </ScrollView>
         </View>
     )

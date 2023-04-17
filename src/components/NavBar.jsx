@@ -17,7 +17,7 @@ const NavBar = ({ Client }) => {
             navigation.navigate("login")
         } else {
 
-            navigation.navigate("profile", { cliente: Client })
+            navigation.navigate("profile", { client: Client })
         }
     }
 

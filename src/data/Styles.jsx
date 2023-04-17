@@ -1,7 +1,4 @@
-import React from 'react';
 import { StyleSheet } from 'react-native';
-
-//@import url('https://fonts.googleapis.com/css2?family=Contrail+One&display=swap');
 
 const styles = StyleSheet.create({
     body: {
@@ -91,6 +88,7 @@ const styles = StyleSheet.create({
             height: "100%",
             padding: 30,
             alignItems: "center",
+            paddingBottom:70,
 
             cantidad: {
                 borderWidth: 3,

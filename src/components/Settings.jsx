@@ -1,72 +1,59 @@
-import React from "react";
-import { Alert, ScrollView, Text, TextInput, View, StyleSheet, Image, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
+import React from "react";
+import { Button, Text,TextInput, View, Image } from "react-native";
+import client from "../data/Client";
 import NavBar from "./NavBar";
-import styles from "../data/Styles";
-import axios from "axios";
 
-export default function Settings({ route }) {
+const Settings = ({route})=>{
     const navigation = useNavigation();
-    const [user, setUser] = useState();
-    const [pass, setPass] = useState();
-    const [comp, setComp] = useState();
-    const [stylesE, setStylesE] = useState();
-    const [stylesI, setStylesI] = useState(styles.login.inputNormal);
 
-    const styleError = StyleSheet.create({ fontWeight: "bold", fontSize: 24, textAlign: "center", color: "red" })
+    let cliente;
+    route.params ? cliente = route.params.client : cliente = null;
 
-    const login = () => {
-        const url = "http://192.168.0.9:8080/login/user";
-        const datos = {
-            userName: user,
-            password: pass
-        }
-        axios.post(url, datos)
-            .then(function (response) {
-                let cliente = response.data
-                if (cliente.nombreUsuario === null) {
-                    setPass("");
-                    setUser("");
-                    setStylesI(styles.login.error.inputError);
-                    setStylesE(styles.login.error.text);
-                    setComp("Usuario o contraseña incorrectos");
-                }
-                else {
-                    Alert.alert("Bienvenido " + cliente.nombre)
-                    navigation.navigate("main", { client: cliente });
-                }
-            })
-            .catch(function (error) {console.log(error);});
-    }
+    if (client !== null) {
     return (
-        <View style={styles.bdyHome2}>
-            <ScrollView style={styles.login}>
-                <Text style={styles.buttons.close} onPress={() => navigation.navigate("main", { client: null })}>Volver</Text>
-
-                <Text style={[styles.login.text, { textAlign: "center" }]}>Iniciar sesión</Text>
-                <Text style={stylesE}>{comp}</Text>
-                <Text style={styles.login.text}>Nombre de usuario:</Text>
-
-                <TextInput
-                    style={stylesI}
-                    placeholder="Username"
-                    onChange={(value) => setUser(value.nativeEvent.text)}
-                    value={user}
-                />
-                <Text style={styles.login.text}>Contraseña:</Text>
-                <TextInput
-                    style={stylesI}
-                    placeholder="Password"
-                    secureTextEntry={true}
-                    onChange={(value) => setPass(value.nativeEvent.text)}
-                    value={pass}
-                />
-                <Text onPress={login} style={styles.buttons}>Entrar</Text>
-
-                <Text style={{ fontWeight: "bold", fontSize: 17, marginTop: 15 }}>¿No tienes cuenta? Cree una...</Text>
-                <Text onPress={() => navigation.navigate("createAccount")} style={styles.buttons.close}>Crear cuenta</Text>
-            </ScrollView>
+        <View>
+            <NavBar Verificate={verification} />
+        <View
+        style={{paddingTop:30}}>
+            
+            <Text>Editar perfil</Text>
+            <Image source={client.imagen}
+                    style={{ width: 200, height: 200, alignSelf:"center" }} />
+            
+            <Text style = {{paddingTop:10}}>Nombre:</Text>
+            <TextInput
+                placeholder={client.name}
+            />
+            <Text style = {{paddingTop:10}}>Primer Apellido:</Text>
+            <TextInput
+                placeholder={client.firstLastName}
+            />
+            <Text style = {{paddingTop:10}}>Edad:</Text>
+            <TextInput
+                placeholder={client.age}
+            />
+            <Text style = {{paddingTop:10}}>Género:</Text>
+            <TextInput
+                placeholder={client.gender}
+            />
+            <Text style = {{paddingTop:10}}>Número de celular:</Text>
+            <TextInput
+                placeholder={client.mobilePhone}
+            />
+            <Text style = {{paddingTop:10}}>Email:</Text>
+            <TextInput
+                placeholder={client.email}
+            />
+            <Button title="Cambiar información" ></Button>
+            <View>
+                
+                <Button title="Volver" onPress={() => navigation.navigate("profile", {verification:true})}/>
+                <Button title="Cerrar sesión" onPress={() => navigation.navigate("main", {verification:false})}/>
+            </View>
+        </View>
         </View>
     )
+    } else return () => navigation.navigate("main", { client: client })
 }
+export default Settings;

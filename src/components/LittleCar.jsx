@@ -145,9 +145,9 @@ const LittleCar = ({ route }) => {
                 <Text style={styles.productoDetalle.tittle}>Carrito de compras {"\n"}
                     Bienvenido {cliente.nombre}</Text>
                 {
-                    carrito.map((data, index) => {
+                    carrito.map((data) => {
                         return (
-                            <View style={{ flexDirection: "row", backgroundColor: "white", borderRadius: 5, marginBottom: 10 }} key={{ index }}>
+                            <View style={{ flexDirection: "row", backgroundColor: "white", borderRadius: 5, marginBottom: 10 }} key={data.idCarrito}>
                                 
                                 <Product videoGame={data} cliente={cliente} />
                                 

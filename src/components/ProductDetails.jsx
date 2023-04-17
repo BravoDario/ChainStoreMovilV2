@@ -114,15 +114,6 @@ const ProductDetails = ({ route }) => {
         }
     }
 
-    const validarwish = () => {
-        if (cliente === null) {
-            Alert.alert("Es necesario iniciar sesión.");
-            navigation.navigate("login")
-        } else {
-            setModalFavoritos(true);
-        }
-    }
-
     const validarCarrito = () => {
         if (cliente === null) {
             Alert.alert("Es necesario iniciar sesión.");
@@ -203,6 +194,7 @@ const ProductDetails = ({ route }) => {
         if (videojuego.material !== undefined) texto += "\n" + videojuego.material
         setContent(texto);
     }
+    
     return (
         <View style={styles.bdyHome}>
             <NavBar Client={cliente} />
@@ -228,33 +220,7 @@ const ProductDetails = ({ route }) => {
                         },
                         { text: 'OK', onPress: () => comprarAhora() },]);
                     }}>Comprar ahora</Text>
-                    <Text style={[styles.buttons, styles.buttons.close]} onPress={() => setModalCompras(!modalCompras)}>Volver</Text>
-                </View>
-            </Modal>
-            <Modal
-                id="Favoritos"
-                animationType="slide"
-                transparent={true}
-                visible={modalFavoritos}
-                onRequestClose={() => {
-                    Alert.alert('Modal has been closed.');
-                    setModalFavoritos(!modalFavoritos);
-                }}>
-
-                <View style={{
-                    backgroundColor: "#D9D9D9DD",
-                    marginTop: 60,
-                    padding: 30,
-                    height: "100%"
-                }}>
-                    <Text style={{}}>Se agregará: {videojuego.producto.titulo} a la lista de favoritos</Text>
-                    <Pressable
-                        style={[styles.button, styles.buttonClose]}
-                        onPress={() => setModalFavoritos(!modalFavoritos)}>
-                        <Text style={styles.textStyle}>Hide Modal</Text>
-                    </Pressable>
-                    <Button title="Comprar" onPress={calculateDistance} />
-                    <Text>{text}</Text>
+                    <Text style={[styles.buttons.close]} onPress={() => setModalCompras(!modalCompras)}>Volver</Text>
                 </View>
             </Modal>
             <Modal
@@ -320,9 +286,6 @@ const ProductDetails = ({ route }) => {
                 <View style={styles.productoDetalle.littleButtons}>
                     <Pressable style={styles.productoDetalle} onPress={validarCarrito}>
                         <Text style={styles.productoDetalle.text}>Agregar al carrito</Text>
-                    </Pressable>
-                    <Pressable style={styles.productoDetalle} onPress={validarwish}>
-                        <Text style={styles.productoDetalle.text}>Agregar a favoritos</Text>
                     </Pressable>
                     <Pressable style={styles.productoDetalle} onPress={validarCompra}>
                         <Text style={styles.productoDetalle.text}>Comprar ahora</Text>
