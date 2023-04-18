@@ -29,7 +29,7 @@ const LittleCar = ({ route }) => {
     route.params ? cliente = route.params.client : cliente = null;
 
     useEffect(() => {
-        const path = "http://192.168.0.9:8080/shopping/getShoppingCars?idCliente=" + cliente.idCliente;
+        const path = "http://10.16.9.63:8080/shopping/getShoppingCars?idCliente=" + cliente.idCliente;
         axios.get(path)
             .then(function (response) {
                 setCarritos(response.data);
@@ -102,16 +102,19 @@ const LittleCar = ({ route }) => {
             idCarrito: carrito.idCarrito,
             fecha: new Date().toLocaleDateString('en-US'),
             idCliente: cliente.idCliente,
-            idProducto: carrito.producto.idProducto
+            producto: {
+                idProducto: carrito.producto.idProducto
+            }
         }
+        console.log(JSON.stringify(compra));
         
-        const url = "http://192.168.0.9:8080/shopping/addCompra";
+        const url = "http://10.16.9.63:8080/shopping/addCompra";
 
         axios.post(url, compra)
             .then(function (response) {
                 if (response.data === true) {
                     Alert.alert("Confirmación", "Seleccione su método de pago c:");
-                    navigation.navigate("payMethod");
+                    navigation.navigate("payMethod", {client:cliente});
                 } else {
                     Alert.alert("Error", "Su compra no pudo ser realizada, intente más tarde :c")
                 }
@@ -124,7 +127,7 @@ const LittleCar = ({ route }) => {
     }
 
     const quitarCarrito = (idCarrito) => {
-        let path = "http://192.168.0.9:8080/shopping/removeShoppingCar?idCarrito=" + idCarrito;
+        let path = "http://10.16.9.63:8080/shopping/removeShoppingCar?idCarrito=" + idCarrito;
         console.log(path);
         axios.get(path)
             .then(function (response) {

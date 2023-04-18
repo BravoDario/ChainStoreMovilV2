@@ -75,7 +75,7 @@ const Profile = ({ route }) => {
         }
     }
     const updateCliente = (currentCliente) => {
-        const url = "http://192.168.0.9:8080/cliente/actualizar";
+        const url = "http://10.16.9.63:8080/cliente/actualizar";
         axios.post(url, currentCliente)
             .then(function (response) {
                 if (response.data === true) {

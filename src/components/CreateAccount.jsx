@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, Button, TextInput, ScrollView, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import clients from "../data/Client";
 import styles from "../data/Styles";
 import axios from "axios";
 
@@ -27,7 +26,7 @@ const CreateAccount = () => {
     const [stylesE, setStylesE] = useState();
 
     const agregarCliente = (cliente) => {
-        const url = "http://192.168.0.9:8080/cliente/insertar";
+        const url = "http://10.16.9.63:8080/cliente/insertar";
         axios.post(url, cliente)
             .then(function (response) {
                 if (response.data === true) {

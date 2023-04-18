@@ -132,7 +132,7 @@ const ProductDetails = ({ route }) => {
             cantidad: cantCarrit,
             comprado: 0
         }
-        const url = "http://192.168.0.9:8080/shopping/addShoppingCar";
+        const url = "http://10.16.9.63:8080/shopping/addShoppingCar";
 
         axios.post(url, carritoCompra)
             .then(function (response) {
@@ -159,7 +159,7 @@ const ProductDetails = ({ route }) => {
             }
         }
         console.log(JSON.stringify(compra));
-        const url = "http://192.168.0.9:8080/shopping/addCompra";
+        const url = "http://10.16.9.63:8080/shopping/addCompra";
 
         axios.post(url, compra)
             .then(function (response) {

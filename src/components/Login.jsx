@@ -6,7 +6,7 @@ import styles from "../data/Styles";
 import axios from "axios";
 import { TouchableOpacity } from "react-native";
 
-export default function Login({ route }) {
+export default function Login() {
     const navigation = useNavigation();
     const [user, setUser] = useState();
     const [pass, setPass] = useState();
@@ -14,10 +14,8 @@ export default function Login({ route }) {
     const [stylesE, setStylesE] = useState();
     const [stylesI, setStylesI] = useState(styles.login.inputNormal);
 
-    const styleError = StyleSheet.create({ fontWeight: "bold", fontSize: 24, textAlign: "center", color: "red" })
-
     const login = () => {
-        const url = "http://192.168.0.9:8080/login/user";
+        const url = "http://10.16.9.63:8080/login/user";
         const datos = {
             userName: user,
             password: pass

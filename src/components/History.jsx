@@ -27,7 +27,7 @@ const History = ({ route }) => {
 
 
     useEffect(() => {
-        axios.get("http://192.168.0.9:8080/shopping/getBoughts?idCliente=" + cliente.idCliente)
+        axios.get("http://10.16.9.63:8080/shopping/getBoughts?idCliente=" + cliente.idCliente)
             .then(function (response) {
                 setCompras(response.data);
             })
@@ -108,7 +108,7 @@ const History = ({ route }) => {
                 <Text style={styles.buttons.close} onPress={() => navigation.navigate("main", { client: cliente })}>Volver</Text>
 
             </ScrollView>
-            <SubNavBar />
+            <SubNavBar cliente={cliente}/>
         </View>
     )
 }

@@ -40,12 +40,6 @@ const SubNavBar = ({cliente}) => {
         <Icon onPress={validarHistory}name="history" size={30} color="#00BFFF" style={styles.subNavBar.text}/>
         <Icon onPress={validarCarrito} name="shopping-bag" size={30} style={styles.subNavBar.text}/>
         <Icon onPress={validarPerfil} name="user" size={30} style={styles.subNavBar.text}/>
-        {/* 
-         //   <Text style={styles.subNavBar.text} onPress={() => navigation.navigate("main", {client:cliente})}>Home</Text>
-        }
-        <Text style={styles.subNavBar.text}>Historial</Text>
-        <Text style={styles.subNavBar.text} onPress={validarCarrito}>Carrito</Text>
-        <Text style={styles.subNavBar.text}>Perfil</Text> */}
     </View>
     )
 }

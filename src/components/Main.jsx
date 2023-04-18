@@ -18,7 +18,7 @@ export default function Main({ route }) {
     const [accesorios, setAccesorios] = useState([]);
 
     useEffect(() => {
-        const path = "http://192.168.0.9:8080";
+        const path = "http://10.16.9.63:8080";
 
         axios.get(path + "/accesorio/get?plataform=0&filter=0")
             .then(function (response) {
