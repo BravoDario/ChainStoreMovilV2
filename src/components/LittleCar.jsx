@@ -15,7 +15,8 @@ const LittleCar = ({ route }) => {
     const navigation = useNavigation();
     const [location, setLocation] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
-    const [carrito, setCarrito] = useState([]);
+    const [carritos, setCarritos] = useState([]);
+
     let coords = {
         lat: 0,
         long: 0
@@ -31,7 +32,7 @@ const LittleCar = ({ route }) => {
         const path = "http://192.168.0.9:8080/shopping/getShoppingCars?idCliente=" + cliente.idCliente;
         axios.get(path)
             .then(function (response) {
-                setCarrito(response.data);
+                setCarritos(response.data);
             })
             .catch(function (error) {
                 console.log(error);
@@ -145,7 +146,7 @@ const LittleCar = ({ route }) => {
                 <Text style={styles.productoDetalle.tittle}>Carrito de compras {"\n"}
                     Bienvenido {cliente.nombre}</Text>
                 {
-                    carrito.map((data) => {
+                    carritos.map((data) => {
                         return (
                             <View style={{ flexDirection: "row", backgroundColor: "white", borderRadius: 5, marginBottom: 10 }} key={data.idCarrito}>
                                 

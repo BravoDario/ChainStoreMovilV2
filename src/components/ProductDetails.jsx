@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useState, useEffect } from 'react';
 import * as Location from 'expo-location';
 import axios from "axios";
-
+import Icon from "react-native-vector-icons/FontAwesome5"
 import NavBar from "./NavBar";
 import SubNavBar from "./SubNavBar";
 import styles from "../data/Styles";
@@ -154,7 +154,9 @@ const ProductDetails = ({ route }) => {
             idCarrito: 0,
             fecha: new Date().toLocaleDateString('en-US'),
             idCliente: cliente.idCliente,
-            idProducto: videojuego.producto.idProducto
+            producto:{
+                idProducto: videojuego.producto.idProducto
+            }
         }
         console.log(JSON.stringify(compra));
         const url = "http://192.168.0.9:8080/shopping/addCompra";
@@ -163,7 +165,7 @@ const ProductDetails = ({ route }) => {
             .then(function (response) {
                 if (response.data === true) {
                     Alert.alert("Confirmación", "Seleccione su método de pago c:");
-                    navigation.navigate("payMethod");
+                    navigation.navigate("payMethod", {client: cliente});
                 } else {
                     Alert.alert("Error", "Su compra no pudo ser realizada, intente más tarde :c")
                 }
@@ -285,14 +287,16 @@ const ProductDetails = ({ route }) => {
             <View style={styles.productoDetalle.allButton}>
                 <View style={styles.productoDetalle.littleButtons}>
                     <Pressable style={styles.productoDetalle} onPress={validarCarrito}>
+                        <Icon name="shopping-cart" size={30} color="#FFF" style={{alignSelf:"center", paddingTop:5}}/>
                         <Text style={styles.productoDetalle.text}>Agregar al carrito</Text>
                     </Pressable>
                     <Pressable style={styles.productoDetalle} onPress={validarCompra}>
+                    <Icon name="money-bill-wave" size={30} color="#FFF" style={{alignSelf:"center", paddingTop:5}}/>
                         <Text style={styles.productoDetalle.text}>Comprar ahora</Text>
                     </Pressable>
                 </View>
-                <Pressable style={styles.productoDetalle} onPress={() => navigation.navigate("main", { client: cliente })}>
-                    <Text style={styles.productoDetalle.text}>Volver</Text>
+                <Pressable style={{}} onPress={() => navigation.navigate("main", { client: cliente })}>
+                    <Text style={styles.buttons.close}>Volver</Text>
                 </Pressable>
             </View>
             <SubNavBar cliente={cliente} />

@@ -11,8 +11,8 @@ const Product = ({ videoGame, cliente }) => {
                 <View style={styles.producto}>
                     <Image source={{ uri: videoGame.producto.listaFotos[0].foto }}
                         style={{ width: 100, height: 120 }} />
-                    <Text style={styles.littleText}>{videoGame.producto.titulo + 
-                    "\n$" + videoGame.producto.precio}</Text>
+                    <Text style={[styles.littleText, { height:55}]}>{videoGame.producto.titulo} </Text>
+                    <Text style={[styles.littleText, {borderTopWidth:2, borderColor:"#D9D9D9"}]}>${videoGame.producto.precio}</Text>
                 </View>
             </TouchableOpacity>
         </View>

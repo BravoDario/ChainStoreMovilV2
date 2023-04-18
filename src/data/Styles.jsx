@@ -38,13 +38,16 @@ const styles = StyleSheet.create({
     },
     subNavBar: {
         flexDirection: "row",
-        backgroundColor: "#F9F9F9EE",
+        backgroundColor: "#F9F9F9",
         marginBottom: 0,
         height: 50,
         borderTopWidth: 4,
         borderBottomWidth: 4,
-        borderColor: "#F9F9F9EE",
-        text: { paddingTop: 6, textAlign: "center", color: "#00BFFF", fontSize: 18, borderColor: "gray", borderRightWidth: 2, flex: 0.5 }
+        borderColor: "#F9F9F9",
+        text: {
+            alignSelf:"center",
+            textAlign: "center", color: "#00BFFF", borderColor: "gray", borderRightWidth: 2, flex: 0.5 
+        }
     },
     producto: {
         backgroundColor: "white",
@@ -57,6 +60,7 @@ const styles = StyleSheet.create({
         margin: 2,
         flex: 0.5,
         backgroundColor: "#1DB2E5",
+        borderRadius:7,
         text: {
             margin: 0,
             color: "#E6FAFF",
